@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 class TareaPantalla extends StatefulWidget {
   const TareaPantalla({super.key});
@@ -10,6 +11,18 @@ class TareaPantalla extends StatefulWidget {
 
 
 class _TareaPantallaState extends State<TareaPantalla> {
+
+  bool _isListening = false;
+
+  @override
+  void initState() { 
+    super.initState();
+    _speech = stt.SpeechToText();
+    
+  }
+  
+  late stt.SpeechToText _speech;
+
   final TextEditingController textoTareaControlador = TextEditingController();
   List <String> tareas= [];
  
@@ -24,6 +37,29 @@ class _TareaPantallaState extends State<TareaPantalla> {
     setState(() {
       tareas.removeAt(index);
     });
+  }
+
+  void _escucharVoz() async{
+    if (!_isListening){
+      bool diponible = await _speech.initialize(
+        onStatus: (status) => print('Estado: $status'),
+        onError: (error) => print('Error : $error'),
+      );
+      if (diponible){
+        setState(() => _isListening = true);
+
+        _speech.listen(
+          onResult:(result) {
+            setState(() {
+              textoTareaControlador.text = result.recognizedWords;
+            });
+          },
+        );
+      }
+    } else{
+      setState(() => _isListening = false);
+      _speech.stop();
+    }
   }
 
 
@@ -44,13 +80,24 @@ class _TareaPantallaState extends State<TareaPantalla> {
             TextField(
               decoration: InputDecoration(
                 labelText: 'Ingresa una tarea',
-                border: OutlineInputBorder()
+                border: OutlineInputBorder(),
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    _isListening ? Icons.mic : Icons.mic_none,
+                    color: _isListening ? Colors.red : Colors.grey,
+                    ),
+                    onPressed: _escucharVoz,
+                    )
               ),
               controller: textoTareaControlador,
             ),
 
             SizedBox(height: 20,),
-        
+
+            
+          Row(
+           mainAxisAlignment: .center,
+            children: [
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.black,
@@ -61,7 +108,21 @@ class _TareaPantallaState extends State<TareaPantalla> {
                   agregarTarea();
                 });
                 
-              }, child: Text('Agregar')),
+              }, child: Icon(Icons.add_circle)),
+
+              SizedBox(width: 50,),
+
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.black,
+                foregroundColor: Colors.white
+                ),
+                onPressed: (){
+                  setState(() {
+                    textoTareaControlador.text = '';
+                  });
+                }, 
+                child: Icon(Icons.delete)),]),
 
 
 
