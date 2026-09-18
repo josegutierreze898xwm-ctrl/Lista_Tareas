@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_tareas/pantallas/tarea_pantalla.dart';
+import 'package:flutter_tareas/pantallas/tarea_dia_pantalla.dart';
+
 
 void main() {
   runApp(const MainApp());
@@ -11,7 +12,7 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
-      home: TareaPantalla()
+      home: TareaDiaPantalla()
     );
   }
 }

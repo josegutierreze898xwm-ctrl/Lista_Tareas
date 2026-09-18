@@ -139,7 +139,7 @@ class _TareaPantallaState extends State<TareaPantalla> {
                     );
                   },
                 ),
-              )
+              ),
           ],
         ),
       ),
